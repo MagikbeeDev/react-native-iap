@@ -1,5 +1,21 @@
 ## Changelogs
 
+- **[4.6.3]**
+  - Renamed param to `purchaseTokenAndroid` in `requestSubscription` since this is android only [#1130](https://github.com/dooboolab/react-native-iap/pull/1130)
+  - Fix for 'RNIapModule.buyItemByType got 6 arguments, expected 7' [#1132](https://github.com/dooboolab/react-native-iap/pull/1132)
+
+- **[4.6.2]**
+  - Fix compatibility issue in android with detox [#1124](https://github.com/dooboolab/react-native-iap/pull/1124)
+  - Fix changing subscription on android [#1129](https://github.com/dooboolab/react-native-iap/pull/1129)
+
+- **[4.6.1]**
+  - Fix xcode 12 compatibility [#1115](https://github.com/dooboolab/react-native-iap/pull/1115)
+  - Prevent unsupported ops crashing in android [#1116](https://github.com/dooboolab/react-native-iap/pull/1116)
+
+- **[4.6.0]**
+  - Upgrade android billing sdk to 3 [#1112](https://github.com/dooboolab/react-native-iap/pull/1112)
+    * `developerIdAndroid` and `accountIdAndroid` params are removed.
+
 - **[4.5.4]**
   - Fix & avoid blindly consuming success purchases [#1085](https://github.com/dooboolab/react-native-iap/pull/1085)
   - Allow specyfing string subtype for product ids [#1089](https://github.com/dooboolab/react-native-iap/pull/1089)

@@ -1,4 +1,3 @@
-
 package com.dooboolab.RNIap;
 
 import android.app.Activity;
@@ -20,7 +19,6 @@ import com.facebook.react.bridge.ObjectAlreadyConsumedException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -186,7 +184,6 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
     for (Purchase purchase : purchases) {
       final ConsumeParams consumeParams = ConsumeParams.newBuilder()
           .setPurchaseToken(purchase.getPurchaseToken())
-          .setDeveloperPayload(purchase.getDeveloperPayload())
           .build();
 
       final ConsumeResponseListener listener = new ConsumeResponseListener() {
@@ -249,7 +246,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
           promise.resolve(false);
           return;
         }
-        final List<Purchase> pendingPurchases = Collections.EMPTY_LIST;
+        final List<Purchase> pendingPurchases = new ArrayList<>();
         for (Purchase purchase : purchases) {
           // we only want to try to consume PENDING items, in order to force cache-refresh for them
           if (purchase.getPurchaseState() == Purchase.PurchaseState.PENDING) {
@@ -314,7 +311,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
               item.putString("introductoryPrice", skuDetails.getIntroductoryPrice());
               item.putString("subscriptionPeriodAndroid", skuDetails.getSubscriptionPeriod());
               item.putString("freeTrialPeriodAndroid", skuDetails.getFreeTrialPeriod());
-              item.putString("introductoryPriceCyclesAndroid", skuDetails.getIntroductoryPriceCycles());
+              item.putString("introductoryPriceCyclesAndroid", String.valueOf(skuDetails.getIntroductoryPriceCycles()));
               item.putString("introductoryPricePeriodAndroid", skuDetails.getIntroductoryPricePeriod());
               // new
               item.putString("iconUrl", skuDetails.getIconUrl());
@@ -419,9 +416,8 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
     final String type,
     final String sku,
     final String oldSku,
+    final String purchaseToken,
     final Integer prorationMode,
-    final String developerId,
-    final String accountId,
     final Promise promise
   ) {
     final Activity activity = getCurrentActivity();
@@ -458,8 +454,8 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
         }
         builder.setSkuDetails(selectedSku);
 
-        if (oldSku != null) {
-          builder.setOldSku(oldSku);
+        if (oldSku != null && purchaseToken != null) {
+          builder.setOldSku(oldSku, purchaseToken);
         }
 
         if (prorationMode != null && prorationMode != -1) {
@@ -487,13 +483,6 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
           }
         }
 
-        if (accountId != null) {
-          builder.setAccountId(accountId);
-        }
-        if (developerId != null) {
-          builder.setDeveloperId(developerId);
-        }
-
         BillingFlowParams flowParams = builder.build();
         BillingResult billingResult = billingClient.launchBillingFlow(activity, flowParams);
         String[] errorData = DoobooUtils.getInstance().getBillingResponseData(billingResult.getResponseCode());
@@ -509,7 +498,6 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
         AcknowledgePurchaseParams acknowledgePurchaseParams =
                 AcknowledgePurchaseParams.newBuilder()
                         .setPurchaseToken(token)
-                        .setDeveloperPayload(developerPayLoad)
                         .build();
                         
         billingClient.acknowledgePurchase(acknowledgePurchaseParams, new AcknowledgePurchaseResponseListener() {
@@ -539,7 +527,6 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
   public void consumeProduct(final String token, final String developerPayLoad, final Promise promise) {
     final ConsumeParams params = ConsumeParams.newBuilder()
         .setPurchaseToken(token)
-        .setDeveloperPayload(developerPayLoad)
         .build();
     billingClient.consumeAsync(params, new ConsumeResponseListener() {
       @Override
